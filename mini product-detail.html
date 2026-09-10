@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Onetwozoom</title>
+    <style>
+        /* --- 基础设置与防溢出保护 --- */
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; background-color: #fafafa; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+        * { box-sizing: border-box; } /* 彻底解决 padding 导致页面撑开需要手动缩小的问题 */
+        a { text-decoration: none; color: inherit; }
+        
+        header { background: #ffffff; padding: 8px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
+        .header-content { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1200px; }
+        .logo-img { width: 300px; height: auto; max-height: 100px; object-fit: contain; display: block; }
+        
+        /* --- 电脑端完美导航栏：靠拢、间距 55px、偏中间 250px --- */
+        nav { flex: 1; display: flex; justify-content: flex-end; padding-right: 250px; }
+        nav ul { list-style: none; display: flex; margin: 0; padding: 0; justify-content: flex-end; gap: 55px; }
+        nav ul li { text-align: center; font-weight: bold; font-size: 1.1em; position: relative; }
+        nav ul li a:hover { color: #e63946; }
+
+        .dropdown { position: relative; padding-bottom: 15px; margin-bottom: -15px; }
+        .dropdown-content { display: none; position: absolute; background-color: #fff; min-width: 220px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); z-index: 1001; border-radius: 8px; top: 100%; left: 50%; transform: translateX(-50%); overflow: hidden; }
+        .dropdown-content a { color: #333; padding: 15px 20px; display: block; text-align: center; font-size: 0.95em; border-bottom: 1px solid #eee; transition: 0.3s; }
+        .dropdown-content a:last-child { border-bottom: none; }
+        .dropdown-content a:hover { background-color: #f1faee; color: #e63946; font-weight: bold; }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content.show-mobile { display: block !important; }
+
+        .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; flex: 1; width: 100%; }
+        
+        .product-view {
+            display: flex;
+            gap: 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        .product-image {
+            flex: 1;
+            position: relative;
+            min-width: 0; 
+            max-width: 500px; 
+        }
+        
+        .product-slider {
+            width: 100%;
+            aspect-ratio: 1 / 1; 
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            position: relative;
+            background-color: #f4f4f4;
+        }
+
+        .product-slides {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .product-slides img {
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .slide-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            z-index: 10;
+        }
+        .slide-btn:hover { background-color: rgba(0, 0, 0, 0.8); }
+        .slide-btn.prev { left: 15px; }
+        .slide-btn.next { right: 15px; }
+
+        .product-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        /* --- 电脑端 Details 字体整体缩小 10% --- */
+        .product-details h1 {
+            font-size: 2.25em; /* 从 2.5em 缩小 10% */
+            color: #1d3557;
+            margin: 0 0 10px 0;
+        }
+        .product-price {
+            font-size: 1.8em; /* 从 2.0em 缩小 10% */
+            color: #e63946;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        /* --- 详情页 From 字体设计 --- */
+        .price-from {
+            font-size: 0.55em;     /* 比大价钱小很多，比例刚好 */
+            color: #333;          /* 黑色字 */
+            font-weight: normal;  /* 不加粗 */
+            margin-right: 6px;    /* 与后面红色的价钱隔开一点距离 */
+            vertical-align: middle; /* 视觉微调居中对齐 */
+        }
+
+        .product-description {
+            font-size: 1.035em; /* 从 1.15em 缩小 10% */
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .back-btn {
+            font-size: 0.9em; /* 缩小 10% */
+            margin-top: 20px;
+            display: inline-block;
+            color: #457b9d;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        footer { background: #000; color: white; text-align: center; padding: 25px 20px; margin-top: 40px; }
+        footer p { margin: 0; font-size: 0.95em; color: #bbb; }
+
+        /* =============== 手机端专属规则 =============== */
+        @media (max-width: 768px) {
+            header { padding: 10px 15px; }
+            .header-content { flex-direction: column; gap: 10px; }
+            
+            /* 手机端 Logo 高度减半，完美居中适配 */
+            .logo-img { max-height: 50px; width: 150px; }
+            
+            /* 手机端完美导航栏：100% 绝对平分 */
+            nav { padding-right: 0; justify-content: center; width: 100%; display: flex; }
+            nav ul { flex-wrap: nowrap; justify-content: space-between; gap: 0; font-size: 0.82em; width: 100%; white-space: nowrap; }
+            nav ul li { flex: 1; text-align: center; }
+            
+            .dropdown { padding-bottom: 0; margin-bottom: 0; position: static; }
+            .dropdown-content { width: 100%; left: 0; transform: none; margin-top: 10px; box-shadow: none; border: 1px solid #eee; border-radius: 0; }
+            
+            /* 详情页手机端优化：控制尺寸，杜绝溢出 */
+            .container { margin: 20px auto; padding: 0 15px; }
+            .product-view { flex-direction: column; padding: 20px; gap: 20px; }
+            
+            /* 修复照片过大的问题：限制最大宽度并居中显示 */
+            .product-image { max-width: 100%; display: flex; justify-content: center; } 
+            .product-slider { 
+                max-width: 320px; /* 限制手机端照片的最大尺寸，防止占据全屏 */
+                width: 100%; 
+            }
+
+            .product-details { text-align: center; } /* 手机端文字居中更好看 */
+            
+            /* 标题和价钱字体保持不变，缩短价钱与下方 Description 的距离 (-50%) */
+            .product-details h1 { font-size: 1.6em; }
+            .product-price { 
+                font-size: 1.4em; 
+                padding-bottom: 7px; /* 从 15px 减少 50% 到 7px */
+                margin-bottom: 7px;  /* 从 15px 减少 50% 到 7px */
+            }
+            .product-description { font-size: 0.95em; text-align: left; margin-top: 0; }
+            
+            .slide-btn { padding: 8px 12px; font-size: 16px; } /* 缩小手机端照片的左右切换按钮 */
+        }
+
+        @media (max-width: 380px) {
+            nav ul { font-size: 0.75em; }
+            .product-slider { max-width: 280px; } /* 极小屏幕进一步缩放照片 */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="index.html">
+                <img src="one-two-zoom-logo.png" alt="Onetwozoom Logo" class="logo-img">
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li class="dropdown">
+                        <a href="index.html#home" id="mobile-service-toggle" style="cursor: pointer;">Services &#9662;</a>
+                        <div class="dropdown-content" id="mobile-dropdown-menu">
+                            <a href="service-photoprint.html">Photo Print</a>
+                            <a href="service-wallart.html">Wall Art & Decor</a>
+                            <a href="service-sticker.html">Sticker</a>
+                            <a href="service-album.html">Photo Album</a>
+                            <a href="service-service.html">Other Service</a>
+                        </div>
+                    </li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="product-view">
+            <div class="product-image">
+                <div class="product-slider">
+                    <div class="product-slides" id="detailSlides">
+                        <img src="mini.jpg" alt="Instax Mini Photo Album 200 Pockets View 1">
+                        <img src="mini1.jpg" alt="Hardcover Pocket Album for Lomo Cards View 2">
+                    </div>
+                    <button class="slide-btn prev" onclick="changeDetailSlide(-1)">&#10094;</button>
+                    <button class="slide-btn next" onclick="changeDetailSlide(1)">&#10095;</button>
+                </div>
+            </div>
+
+            <div class="product-details">
+                <h1>Instax Album (200pcs)</h1>
+                <div class="product-price"><span class="price-from">From</span>RM 17.90</div>
+                <div class="product-description">
+                    <p>The hardcover pocket album safely stores up to 200 Instax mini photos, lomo cards, or polaroids in non-glare, acid-free clear poly plastic pockets. Featuring a lightweight yet durable imagewrap hardcover, this compact and protective album keeps your cherished memories safe and beautifully displayed for years to come.</p>
+                    <p><strong>Pages:</strong> 200<br>
+                    <strong>Size:</strong> Instax Mini</p>
+                </div>
+                
+                <a href="service-album.html" class="back-btn">&#10094; Back to Photo Album Menu</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Onetwozoom. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let currentDetailSlide = 0;
+        
+        function changeDetailSlide(direction) {
+            const slides = document.getElementById('detailSlides');
+            const totalSlides = document.querySelectorAll('#detailSlides img').length;
+            
+            currentDetailSlide += direction;
+            
+            if (currentDetailSlide >= totalSlides) { 
+                currentDetailSlide = 0; 
+            } 
+            else if (currentDetailSlide < 0) { 
+                currentDetailSlide = totalSlides - 1; 
+            }
+            
+            slides.style.transform = `translateX(-${currentDetailSlide * 100}%)`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileServiceToggle = document.getElementById('mobile-service-toggle');
+            const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+            
+            // 手机端 Services 菜单展开/收起
+            mobileServiceToggle.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    mobileDropdownMenu.classList.toggle('show-mobile');
+                }
+            });
+
+            // 植入“完美导航栏”标准：点击其他链接时自动收回下拉菜单
+            document.querySelectorAll('nav ul li a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    if (this.id === 'mobile-service-toggle') return;
+
+                    if (mobileDropdownMenu.classList.contains('show-mobile')) {
+                        mobileDropdownMenu.classList.remove('show-mobile');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

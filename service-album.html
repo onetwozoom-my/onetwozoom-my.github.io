@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Album | Onetwozoom</title>
+    <style>
+        /* --- 植入完美平滑滚动与防溢出保护 --- */
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; background-color: #fafafa; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+        * { box-sizing: border-box; } /* 彻底解决 padding 导致页面撑开需要手动缩小的问题 */
+        a { text-decoration: none; color: inherit; }
+        
+        header { background: #ffffff; padding: 8px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; }
+        .header-content { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1200px; }
+        .logo-img { width: 300px; height: auto; max-height: 100px; object-fit: contain; display: block; }
+        
+        /* --- 电脑端完美导航栏：靠拢、间距 55px、偏中间 250px --- */
+        nav { flex: 1; display: flex; justify-content: flex-end; padding-right: 250px; }
+        nav ul { list-style: none; display: flex; margin: 0; padding: 0; justify-content: flex-end; gap: 55px; }
+        nav ul li { text-align: center; font-weight: bold; font-size: 1.1em; position: relative; }
+        nav ul li a:hover { color: #e63946; }
+
+        .dropdown { position: relative; padding-bottom: 15px; margin-bottom: -15px; }
+        .dropdown-content { display: none; position: absolute; background-color: #fff; min-width: 220px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); z-index: 1001; border-radius: 8px; top: 100%; left: 50%; transform: translateX(-50%); overflow: hidden; }
+        .dropdown-content a { color: #333; padding: 15px 20px; display: block; text-align: center; font-size: 0.95em; border-bottom: 1px solid #eee; transition: 0.3s; }
+        .dropdown-content a:last-child { border-bottom: none; }
+        .dropdown-content a:hover { background-color: #f1faee; color: #e63946; font-weight: bold; }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content.show-mobile { display: block !important; }
+
+        .page-header { 
+            position: relative;
+            background-image: url('laura-espana-vRrhsUBizqc-unsplash.jpg'); 
+            background-size: cover;
+            background-position: center;
+            color: white; 
+            padding: 100px 20px; 
+            text-align: center; 
+        }
+        .page-header::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); 
+            z-index: 1;
+        }
+        .page-header h1 { position: relative; z-index: 2; margin: 0; font-size: 2.8em; letter-spacing: 1px; }
+
+        .container { max-width: 960px; margin: 50px auto; padding: 0 20px; flex: 1; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+        
+        .product-card { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            text-align: center; 
+            transition: transform 0.3s; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            box-sizing: border-box;
+            cursor: pointer;
+            text-decoration: none; 
+            color: inherit; 
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        
+        .product-card img { 
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
+            object-fit: cover; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            background-color: #f4f4f4; 
+            flex-shrink: 0; 
+        }
+        
+        .product-info { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .product-title { 
+            font-size: 1.1em; 
+            color: #1d3557; 
+            font-weight: bold; 
+            line-height: 1.3; 
+            margin-bottom: auto; 
+        }
+        
+        /* 电脑端价钱放大 */
+        .product-price { 
+            font-size: 1.25em; 
+            color: #e63946; 
+            font-weight: bold; 
+            margin-top: 10px;
+        }
+
+        /* 电脑端 From 字体缩小到 0.7em */
+        .price-from {
+            font-size: 0.7em;     
+            color: #333;          
+            font-weight: normal;  
+            margin-right: 4px;    
+        }
+
+        footer { background: #000; color: white; text-align: center; padding: 25px 20px; margin-top: 40px; }
+        footer p { margin: 0; font-size: 0.95em; color: #bbb; }
+
+        @media (max-width: 900px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); } 
+        }
+        
+        /* =============== 手机端专属规则 =============== */
+        @media (max-width: 768px) {
+            header { padding: 10px 15px; }
+            .header-content { flex-direction: column; gap: 10px; }
+            
+            /* 手机端 Logo 高度减半，完美居中适配 */
+            .logo-img { max-height: 50px; width: 150px; }
+            
+            /* 手机端完美导航栏：100% 绝对平分 */
+            nav { padding-right: 0; justify-content: center; width: 100%; display: flex; }
+            nav ul { flex-wrap: nowrap; justify-content: space-between; gap: 0; font-size: 0.82em; width: 100%; white-space: nowrap; }
+            nav ul li { flex: 1; text-align: center; }
+            
+            .dropdown { padding-bottom: 0; margin-bottom: 0; position: static; }
+            .dropdown-content { width: 100%; left: 0; transform: none; margin-top: 10px; box-shadow: none; border: 1px solid #eee; border-radius: 0; }
+            
+            /* 1. 缩短 Banner 背景高度 30% (从 60px 缩短到 40px) */
+            .page-header { padding: 40px 20px; }
+            
+            /* 大标题字体缩小 38% */
+            .page-header h1 { font-size: 1.36em; }
+            
+            .container { margin: 30px auto; padding: 0 15px; }
+            .product-grid { gap: 15px; } 
+
+            /* 2. 极致压缩 Container 高度 */
+            .product-card { padding: 8px; } /* 缩小内边距 */
+            .product-card img { margin-bottom: 6px; } /* 缩小照片和文字的距离 */
+            
+            /* 3. 手机端商品标题增大 20% */
+            .product-title { 
+                font-size: 0.92em; 
+                line-height: 1.2; 
+                margin-bottom: 2px;
+            }
+            
+            /* 4. 手机端价钱放大 */
+            .product-price { 
+                font-size: 0.95em; 
+                margin-top: 4px; 
+            }
+
+            /* 手机端 From 字体缩小到 0.75em */
+            .price-from {
+                font-size: 0.75em; 
+                margin-right: 3px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            nav ul { font-size: 0.75em; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="index.html">
+                <img src="one-two-zoom-logo.png" alt="Onetwozoom Logo" class="logo-img">
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#about">About Us</a></li>
+                    <li class="dropdown">
+                        <a href="index.html#home" id="mobile-service-toggle" style="cursor: pointer;">Services &#9662;</a>
+                        <div class="dropdown-content" id="mobile-dropdown-menu">
+                            <a href="service-photoprint.html">Photo Print</a>
+                            <a href="service-wallart.html">Wall Art & Decor</a>
+                            <a href="service-sticker.html">Sticker</a>
+                            <a href="service-album.html">Photo Album</a>
+                            <a href="service-service.html">Other Service</a>
+                        </div>
+                    </li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <h1>Photo Album</h1>
+    </div>
+
+    <div class="container">
+        <div class="product-grid">
+            
+            <a href="album4R%20product-detail.html" class="product-card">
+                <img src="album4R.jpg" alt="4R Photo Album 100 Pockets">
+                <div class="product-info">
+                    <div class="product-title">4R Album (100pcs)</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 17.90</div>
+                </div>
+            </a>
+
+            <a href="album5R%20product-detail.html" class="product-card">
+                <img src="album5R.jpg" alt="4R Photo Album 200 Pockets">
+                <div class="product-info">
+                    <div class="product-title">4R Album (200pcs)</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 33.90</div>
+                </div>
+            </a>
+
+            <a href="craft%20product-detail.html" class="product-card">
+                <img src="craft.jpg" alt="Craft Brown Paper Photo Album">
+                <div class="product-info">
+                    <div class="product-title">Craft Brown Album</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 5.90</div>
+                </div>
+            </a>
+
+            <a href="mini%20product-detail.html" class="product-card">
+                <img src="mini.jpg" alt="Instax Mini Photo Album 200 Pockets">
+                <div class="product-info">
+                    <div class="product-title">Instax Album</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 17.90</div>
+                </div>
+            </a>
+
+            <a href="transparent%20product-detail.html" class="product-card">
+                <img src="transparent.jpg" alt="Transparent Cover Photo Album">
+                <div class="product-info">
+                    <div class="product-title">Transparent Album</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 13.90</div>
+                </div>
+            </a>
+
+            <a href="album3R%20product-detail.html" class="product-card">
+                <img src="album3R.jpg" alt="3R Photo Album 100 Pockets">
+                <div class="product-info">
+                    <div class="product-title">3R Album (100pcs)</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 17.90</div>
+                </div>
+            </a>
+
+            <a href="pure%20product-detail.html" class="product-card">
+                <img src="pure.jpg" alt="Pure Colour Hardcover Photo Album">
+                <div class="product-info">
+                    <div class="product-title">Pure Colour Album</div>
+                    <div class="product-price"><span class="price-from">From</span>RM 13.90</div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Onetwozoom. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileServiceToggle = document.getElementById('mobile-service-toggle');
+            const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+            
+            // 手机端 Services 菜单展开/收起
+            mobileServiceToggle.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    mobileDropdownMenu.classList.toggle('show-mobile');
+                }
+            });
+
+            // 植入“完美导航栏”标准：点击其他链接时自动收回下拉菜单
+            document.querySelectorAll('nav ul li a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    if (this.id === 'mobile-service-toggle') return;
+
+                    if (mobileDropdownMenu.classList.contains('show-mobile')) {
+                        mobileDropdownMenu.classList.remove('show-mobile');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

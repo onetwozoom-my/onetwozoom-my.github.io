@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onetwozoom | Professional Photo Printing & Studio in Setapak KL</title>
+    <meta name="description" content="Looking for photo printing, passport & visa photos, custom framing, or digital printing in Setapak, Kuala Lumpur? Onetwozoom has over 30 years of trusted experience.">
+    <style>
+        /* 去除 CSS 的 scroll-padding，改用更精准的 JS 动态计算 */
+        html { scroll-behavior: smooth; }
+
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; color: #fff; line-height: 1.6; background-color: #000; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        
+        header { 
+            background: #ffffff; 
+            padding: 8px 50px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            display: flex; 
+            justify-content: center; 
+            color: #333; 
+        }
+        .header-content { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1200px; }
+        
+        /* 电脑端 Logo 原始尺寸 */
+        .logo-img { width: 300px; height: auto; max-height: 100px; object-fit: contain; display: block; }
+        
+        /* --- 电脑端导航栏排版：靠拢(间距扩大至55px)、通过 padding-right 往中间推移 250px --- */
+        nav { flex: 1; display: flex; justify-content: flex-end; padding-right: 250px; }
+        nav ul { list-style: none; display: flex; margin: 0; padding: 0; justify-content: flex-end; gap: 55px; } /* 间距增大约30% */
+        nav ul li { text-align: center; font-weight: bold; font-size: 1.1em; position: relative; }
+        nav ul li a:hover { color: #e63946; }
+
+        .dropdown { position: relative; padding-bottom: 15px; margin-bottom: -15px; }
+        .dropdown-content { display: none; position: absolute; background-color: #fff; min-width: 220px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1); z-index: 1001; border-radius: 8px; top: 100%; left: 50%; transform: translateX(-50%); overflow: hidden; }
+        .dropdown-content a { color: #333; padding: 15px 20px; text-decoration: none; display: block; text-align: center; font-size: 0.95em; border-bottom: 1px solid #eee; transition: 0.3s; }
+        .dropdown-content a:hover { background-color: #f1faee; color: #e63946; font-weight: bold; }
+        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content.show-mobile { display: block !important; }
+
+        .fullscreen-section {
+            min-height: calc(100vh - 70px); 
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            padding: 20px 40px; 
+            box-sizing: border-box;
+            position: relative; 
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #home { background-image: url('kunal-patil-8ZKlgI_G-mw-unsplash.jpg'); }
+        #about { background-image: url('bg-about.jpg'); }
+        #contact { background-image: url('bg-contact.jpg'); }
+
+        .fullscreen-section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.65); 
+            z-index: 0;
+        }
+        
+        .section-inner, .slider-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .slider-wrapper { width: 100%; max-width: 1000px; margin: 0 auto; }
+        .slider-container { position: relative; width: 100%; aspect-ratio: 3 / 2; background-color: #000; overflow: hidden; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        .slides { display: flex; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slide { min-width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; color: white; flex-direction: column; }
+        .slide img { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; z-index: 1; }
+        
+        /* --- 轮播图排版 --- */
+        .hero-content-top { position: absolute; top: 22%; width: 100%; z-index: 2; padding: 0 20px; box-sizing: border-box; }
+        .hero-content-bottom { position: absolute; bottom: 18%; width: 100%; z-index: 2; padding: 0 20px; box-sizing: border-box; }
+        
+        .hero-content-top h2 { font-size: 3.2em; margin: 0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5); white-space: nowrap; }
+        
+        .discover-btn { 
+            display: inline-block; 
+            padding: 10px 28px; 
+            font-size: 1.15em; 
+            background-color: #e63946; 
+            color: white; 
+            font-weight: normal; 
+            border-radius: 25px; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 10px rgba(230, 57, 70, 0.4); 
+        }
+        .discover-btn:hover { background-color: #d62828; transform: scale(1.05); }
+
+        .prev, .next { cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); padding: 15px 20px; color: white; font-size: 24px; font-weight: bold; background-color: rgba(0, 0, 0, 0.4); border: none; z-index: 10; border-radius: 5px; transition: 0.3s; }
+        .prev:hover, .next:hover { background-color: rgba(0, 0, 0, 0.8); }
+        .prev { left: 15px; } .next { right: 15px; }
+
+        .about-section-inner { max-width: 1300px; margin: 0 auto; text-align: center; width: 100%; } 
+        .about-section-inner h2 { color: #fff; margin-top: 0px; margin-bottom: 30px; font-size: 1.8em; border-bottom: 3px solid #e63946; display: inline-block; padding-bottom: 6px; }
+
+        .about-top-row { display: flex; align-items: stretch; justify-content: space-between; gap: 5%; text-align: left; }
+        
+        .about-images { width: 55%; flex-shrink: 0; }
+        .about-slider-container { width: 100%; height: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
+        .about-slides { display: flex; width: 100%; height: 100%; transition: transform 0.6s ease-in-out; }
+        .about-slide-img { min-width: 100%; height: 100%; object-fit: cover; }
+
+        .about-unified-text { width: 40%; display: flex; flex-direction: column; justify-content: space-between; }
+        .about-unified-text p { font-size: 1.05em; color: #ddd; line-height: 1.65; margin: 0; text-align: left; }
+
+        .section-inner { max-width: 1000px; margin: 0 auto; text-align: center; width: 100%; }
+        .section-inner h2 { color: #fff; margin-top: 0px; margin-bottom: 20px; font-size: 1.8em; border-bottom: 3px solid #e63946; display: inline-block; padding-bottom: 6px; }
+
+        .contact-wrapper { max-width: 750px; margin: 0 auto; text-align: left; font-size: 1.1em; line-height: 1.7; color: #ddd; } 
+        .contact-wrapper p { margin: 10px 0; }
+        .contact-wrapper a { color: #fff; font-weight: normal; text-decoration: none; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .contact-wrapper a:hover { text-decoration: underline; color: #fff; }
+        
+        .contact-row { display: flex; align-items: center; flex-wrap: nowrap; gap: 15px; margin: 15px 0; }
+        .contact-row span { margin-right: 5px; white-space: nowrap; } 
+        
+        .inline-icon { width: 84px; height: 84px; object-fit: contain; transition: transform 0.3s ease; }
+        .contact-row a:hover .inline-icon { transform: scale(1.1); } 
+        .contact-row a:hover { text-decoration: none; } 
+
+        footer { background: #000; color: white; text-align: center; padding: 20px; }
+        footer p { margin: 0; font-size: 0.9em; color: #bbb; }
+
+        .reveal-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-up.active, .reveal-left.active, .reveal-right.active { opacity: 1; transform: translate(0, 0); }
+        .delay-1 { transition-delay: 0.4s; }  
+        .delay-2 { transition-delay: 0.8s; }  
+
+        /* =============== 手机端专属规则 =============== */
+        @media (max-width: 768px) {
+            header { padding: 10px 15px; }
+            .header-content { flex-direction: column; gap: 10px; }
+            
+            /* 【新规则】手机端 Logo 高度和宽度缩小 50% */
+            .logo-img { max-height: 50px; width: 150px; }
+            
+            /* 手机端导航栏恢复绝对平分、重置靠右设置 */
+            nav { padding-right: 0; justify-content: center; width: 100%; display: flex; }
+            nav ul { flex-wrap: nowrap; justify-content: space-between; gap: 0; font-size: 0.82em; width: 100%; white-space: nowrap; }
+            nav ul li { flex: 1; text-align: center; }
+            
+            .dropdown { padding-bottom: 0; margin-bottom: 0; position: static; }
+            .dropdown:hover .dropdown-content { display: none; } 
+            .dropdown-content.show-mobile { display: block !important; }
+            .dropdown-content { width: 100%; left: 0; transform: none; margin-top: 10px; box-shadow: none; border: 1px solid #eee; border-radius: 0; }
+            
+            .slider-container { aspect-ratio: 4 / 3; } 
+            
+            .hero-content-top { top: 18%; }
+            .hero-content-bottom { bottom: 12%; }
+            
+            .hero-content-top h2 { font-size: 1.3em; white-space: nowrap; } 
+            .discover-btn { font-size: 0.75em; padding: 6px 14px; }
+            .prev, .next { font-size: 12px; padding: 8px 10px; }
+            
+            .about-unified-text p { font-size: 0.85em; text-align: left; margin-bottom: 10px; line-height: 1.5; }
+            .contact-wrapper { font-size: 0.85em; padding: 0 5px; }
+            
+            .about-section-inner h2, .section-inner h2 { font-size: 1.35em; margin-bottom: 15px; }
+            
+            .fullscreen-section { background-attachment: scroll; min-height: auto; padding: 15px 15px; } 
+            
+            .about-top-row { flex-direction: column; gap: 15px; align-items: center; }
+            .about-images, .about-unified-text { width: 100%; text-align: center; }
+            .about-unified-text { justify-content: flex-start; gap: 10px; }
+            
+            .contact-row { gap: 10px; justify-content: flex-start; }
+            .inline-icon { width: 46px; height: 46px; } 
+        }
+
+        @media (max-width: 380px) {
+            .contact-wrapper { font-size: 0.8em; }
+            .about-unified-text p { font-size: 0.8em; }
+            nav ul { font-size: 0.75em; }
+            .contact-row { gap: 6px; }
+            .inline-icon { width: 40px; height: 40px; }
+            .hero-content-top h2 { font-size: 1.15em; } 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="#home">
+                <img src="one-two-zoom-logo.png" alt="Onetwozoom Logo" class="logo-img">
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li class="dropdown">
+                        <a href="#home" id="mobile-service-toggle" style="cursor: pointer;">Services &#9662;</a>
+                        <div class="dropdown-content" id="mobile-dropdown-menu">
+                            <a href="service-photoprint.html">Photo Print</a>
+                            <a href="service-wallart.html">Wall Art & Decor</a>
+                            <a href="service-sticker.html">Sticker</a>
+                            <a href="service-album.html">Photo Album</a>
+                            <a href="service-service.html">Other Service</a>
+                        </div>
+                    </li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div id="home" class="fullscreen-section">
+        <div class="slider-wrapper reveal-up delay-1">
+            <div class="slider-container">
+                <div class="slides" id="mainSlides">
+                    
+                    <div class="slide">
+                        <img src="raj-rana-IB_x2fNdLEw-unsplash.jpg" alt="Photo Print Services in KL">
+                        <div class="hero-content-top">
+                            <h2>Photo Print</h2>
+                        </div>
+                        <div class="hero-content-bottom">
+                            <a href="service-photoprint.html" class="discover-btn">Discover More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="slide">
+                        <img src="juan-pablo-2YJcz-Ord8c-unsplash.jpg" alt="Wall Art and Custom Framing">
+                        <div class="hero-content-top">
+                            <h2>Wall Art & Decor</h2>
+                        </div>
+                        <div class="hero-content-bottom">
+                            <a href="service-wallart.html" class="discover-btn">Discover More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="slide">
+                        <img src="rainier-watch-GTp6bK7NsdU-unsplash.jpg" alt="Custom Sticker Printing">
+                        <div class="hero-content-top">
+                            <h2>Sticker</h2>
+                        </div>
+                        <div class="hero-content-bottom">
+                            <a href="service-sticker.html" class="discover-btn">Discover More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="slide">
+                        <img src="laura-espana-vRrhsUBizqc-unsplash.jpg" alt="Premium Photo Albums">
+                        <div class="hero-content-top">
+                            <h2>Photo Album</h2>
+                        </div>
+                        <div class="hero-content-bottom">
+                            <a href="service-album.html" class="discover-btn">Discover More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="slide">
+                        <img src="jakub-zerdzicki-m1rcaB0tStg-unsplash.jpg" alt="Passport and ID Photo Services">
+                        <div class="hero-content-top">
+                            <h2>Other Service</h2>
+                        </div>
+                        <div class="hero-content-bottom">
+                            <a href="service-service.html" class="discover-btn">Discover More</a>
+                        </div>
+                    </div>
+                    
+                </div>
+                <button class="prev" onclick="changeMainSlide(-1)">&#10094;</button>
+                <button class="next" onclick="changeMainSlide(1)">&#10095;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="about" class="fullscreen-section">
+        <div class="about-section-inner">
+            <h2 class="reveal-up delay-1">About Onetwozoom</h2>
+            
+            <div class="about-top-row">
+                <div class="about-images reveal-left delay-1">
+                    <div class="about-slider-container">
+                        <div class="about-slides" id="aboutSlides">
+                            <img src="unnamed1.jpg" alt="Onetwozoom Store Front" class="about-slide-img">
+                            <img src="unnamed2.jpg" alt="Onetwozoom Interior" class="about-slide-img">
+                            <img src="unnamed3.jpg" alt="Onetwozoom Studio" class="about-slide-img">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-unified-text reveal-right delay-2">
+                    <p>Located in Setapak, Kuala Lumpur, <strong>Onetwozoom</strong> is a premier professional photo studio with over 30 years of trusted experience. We specialize in high-quality photo printing, urgent passport and visa photos, and personalized studio portraits, combining decades of technical expertise with a warm, neighborhood touch.</p>
+                    <p>Beyond our KL walk-in store, we offer top-tier custom framing, bespoke photo albums, and vibrant sticker printing to customers nationwide via Shopee, Lazada, and TikTok Shop. Backed by countless 5-star reviews for our secure packaging and true-to-life print quality, Onetwozoom seamlessly blends traditional photography excellence with modern e-commerce convenience to help you capture and keep your best memories for a lifetime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact" class="fullscreen-section">
+        <div class="section-inner">
+            <h2 class="reveal-up delay-1">Contact & Location</h2>
+            
+            <div class="contact-wrapper reveal-up delay-2">
+                <p>📍 <strong>Walk-in:</strong> 237, Jalan Genting Klang, Taman Ayer Panas, 53000 Kuala Lumpur.</p>
+                <p>🕒 <strong>Office Hours:</strong> 10:00 AM - 8:00 PM, 7 days a week</p>
+                <p>📞 <strong>Phone:</strong> +60 16-688 0303</p>
+                <p>✉️ <strong>Email:</strong> 12zoomdigital@gmail.com</p>
+
+                <div class="contact-row">
+                    <span>📱 <strong>Follow Us:</strong></span>
+                    <a href="https://www.facebook.com/12zoom/" target="_blank" title="Facebook">
+                        <img src="facebook-logo-facebook-icon-transparent-free-png.jpg" alt="Onetwozoom Facebook" class="inline-icon">
+                    </a>
+                    <a href="https://www.instagram.com/onetwozoom_?igsh=MXhmbXJnYW1yeHp0aw==" target="_blank" title="Instagram">
+                        <img src="instagram-circle-logo-icon-ig-app-transparent-background-premium-social-media-design-for-digital-download-free-png.jpg" alt="Onetwozoom Instagram" class="inline-icon">
+                    </a>
+                    <a href="https://www.tiktok.com/@onetwozoom_?_r=1&_t=ZS-98dLiZ7BV9p" target="_blank" title="TikTok">
+                        <img src="tiktok-icon-free-png.jpg" alt="Onetwozoom TikTok" class="inline-icon">
+                    </a>
+                </div>
+
+                <div class="contact-row">
+                    <span>🛒 <strong>Shop Online:</strong></span>
+                    <a href="https://my.shp.ee/2CjdjewX" target="_blank" title="Shopee">
+                        <img src="shopee-logo-shopee-icon-transparent-social-media-icons-free-png.jpg" alt="Onetwozoom Shopee Store" class="inline-icon">
+                    </a>
+                    <a href="https://www.lazada.com.my" target="_blank" title="Lazada">
+                        <img src="lazada-logo-rounded-lazada-logo-free-png.jpg" alt="Onetwozoom Lazada Store" class="inline-icon">
+                    </a>
+                    <a href="https://vt.tiktok.com/ZS4HgU36F/?page=TikTokShop" target="_blank" title="TikTok Shop">
+                        <img src="tiktok-icon-free-png.jpg" alt="Onetwozoom TikTok Shop" class="inline-icon">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Onetwozoom. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let currentMainSlide = 0;
+        const mainSlides = document.getElementById('mainSlides');
+        const totalMainSlides = document.querySelectorAll('#mainSlides .slide').length;
+        let mainSlideInterval;
+
+        function showMainSlide(index) {
+            if (index >= totalMainSlides) { currentMainSlide = 0; } 
+            else if (index < 0) { currentMainSlide = totalMainSlides - 1; } 
+            else { currentMainSlide = index; }
+            mainSlides.style.transform = `translateX(-${currentMainSlide * 100}%)`;
+        }
+
+        function changeMainSlide(direction) {
+            showMainSlide(currentMainSlide + direction);
+            resetMainInterval();
+        }
+
+        function autoMainSlide() { showMainSlide(currentMainSlide + 1); }
+        function resetMainInterval() {
+            clearInterval(mainSlideInterval);
+            mainSlideInterval = setInterval(autoMainSlide, 3000); 
+        }
+        mainSlideInterval = setInterval(autoMainSlide, 3000);
+
+
+        let currentAboutSlide = 0;
+        const aboutSlides = document.getElementById('aboutSlides');
+        const totalAboutSlides = document.querySelectorAll('.about-slide-img').length;
+        
+        function autoAboutSlide() {
+            currentAboutSlide++;
+            if (currentAboutSlide >= totalAboutSlides) {
+                currentAboutSlide = 0;
+            }
+            aboutSlides.style.transform = `translateX(-${currentAboutSlide * 100}%)`;
+        }
+        setInterval(autoAboutSlide, 2000);
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15 
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active'); 
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
+            revealElements.forEach(el => observer.observe(el));
+
+            const mobileServiceToggle = document.getElementById('mobile-service-toggle');
+            const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+            
+            // 手机端 Services 菜单展开/收起
+            mobileServiceToggle.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    mobileDropdownMenu.classList.toggle('show-mobile');
+                }
+            });
+
+            // 核心 JS：动态精准定位滑动 & 手机端菜单自动收回
+            document.querySelectorAll('nav ul li a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    // 如果点击的是 Services 展开按钮本身，不执行滑动逻辑
+                    if (this.id === 'mobile-service-toggle') return;
+
+                    e.preventDefault();
+
+                    // 手机端：点击任何其他选项，自动收回 Services 菜单
+                    if (mobileDropdownMenu.classList.contains('show-mobile')) {
+                        mobileDropdownMenu.classList.remove('show-mobile');
+                    }
+
+                    const targetId = this.getAttribute('href');
+                    
+                    if (targetId === '#contact') {
+                        // Contact：直接滑动到底部，完美展示 Footer
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // Home 和 About Us：动态计算 Header 高度，精准居中
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            const headerHeight = document.querySelector('header').offsetHeight;
+                            const elementPosition = targetElement.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+                            window.scrollTo({
+                                top: offsetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
